@@ -27,5 +27,5 @@ try:
     elif(valorNovo == 0):
         print('Atencao, esta foi sua ultima janta')
 
-catch NameError:
+except NameError:
     pass
