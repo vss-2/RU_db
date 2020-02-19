@@ -1,44 +1,67 @@
 # -*- coding: utf-8 -*-
+import datetime
+from subprocess import call
 
-lerArquivo = open('jantas.txt', 'r')
+def input_err(onde):
+	print('Trollou o input em\n'+str(onde)+'\ntente novamente!')
+	return
 
-try:
-	try:
-		entrada = input()
-		entrada = entrada.split(' ')
-		
-		# Entrada pode ser no formato:
-		# adicionar X, sendo X inteiro
-		# remover
-		valorAntigo = lerArquivo.read()
-		
-		if (entrada[0] == 'adicionar'):
-			valorAntigo = int(valorAntigo.replace('\n',''))
-			valorNovo = int(entrada[1])
-			valorNovo = valorAntigo + valorNovo
-		else: 
-		#Caso de remover
-			valorAntigo = int(valorAntigo.replace('\n',''))
-			valorNovo = valorAntigo - 1
+def verQnt():
+	lerArquivo = open('jantas.txt', 'r')
+	qnt_Jantas = int(lerArquivo.readline(1))
+	return qnt_Jantas
 
-		print('Temos agora, no total:', valorNovo)
-		
+def escQnt(num):
+	call(['touch', 'jantas.txt'])
+	escArquivo = open('jantas.txt', 'w')
+	escArquivo.write(num)
+	escArquivo.close()
+	return
 
-		escArquivo = open('jantas.txt', 'w')
+def adicionarJantas():
+	qnt_Jantas = verQnt()
+	adc_Jantas = input('Quantas jantas devo adicionar a quantidade ('+str(qnt_Jantas)+') existente?')
+	
+	if(type(adc_Jantas) == type(0)):
+		escQnt(int(adc_Jantas)+int(qnt_Jantas))
+	else:
+		input_err('Ao inserir a quantidade de jantas, você não colocou um inteiro')
+	return
 
-		output = str(valorNovo) + " "
-		escArquivo.write(output)
-		escArquivo.close()
+def removerJantas():
+	qnt_Jantas = verQnt()
+	qnt_Jantas -= 1
+
+	bool_Hoje = input('É hoje ou não (insira s ou o dia(int))')
+	data = datetime.datetime.now()
+
+	if(bool_Hoje.lower() == 's'):
+		dia  = int(data.strftime('%d'))
+	elif(type(bool_Hoje) == type(0)):
+		dia  = int(bool_Hoje)
+	else:
+		input_err('Ao inserir algo diferente de s ou o dia em inteiros, na hora de remover')
 		
-		if(valorNovo == 1):
-			print('Atenção, esta é sua penultima janta')
-		elif(valorNovo == 0):
-			print('Atenção, esta foi sua última janta')
-			
-		exit()
-		
-	except ValueError:
-		print('Valor inserido não é inteiro, parando execução')
-    
-except NameError:
-    pass
+	mes  = int(data.strftime('%m'))
+	ano  = int(data.strftime('%Y'))
+
+	if(qnt_Jantas == 1):
+		print('Atenção, esta é sua penúltima janta!')
+	elif(qnt_Jantas == 0):
+		print('Atenção, esta foi sua última janta!')
+	lerArquivo.close()
+	
+	call(['rm', 'jantas.txt'])
+	escQnt(qnt_Jantas)
+	return
+
+if __name__ == "__main__":
+	adc_rmv = input('Deseja adicionar X jantas ou remover 1 janta (adc/rmv)?')
+
+	if(adc_rmv.lower() == 'adc'):
+		adicionarJantas()
+	elif(adc_rmv.lower() == 'rmv'):
+		removerJantas()
+	else:
+		input_err('Na hora de dizer a quantidade para adicionar ou se é para remover')
+	exit
